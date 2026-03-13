@@ -1,9 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // output: 'export',  // 静态导出模式不支持 useSearchParams
-  // basePath: '/travel-timeline',
-  // assetPrefix: '/travel-timeline/',
+  output: 'export',
+  trailingSlash: true,
+  images: {
+    unoptimized: true,
+  },
+  basePath: '',
+  assetPrefix: '',
 };
 
 export default nextConfig;

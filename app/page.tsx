@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 // 旅行数据 - 支持多条攻略
 type TripData = {
@@ -381,32 +381,24 @@ function Footer() {
 }
 
 // 加载组件
-function Loading() {
-  return (
-    <div style={{ 
-      display: 'flex', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      minHeight: '50vh',
-      color: 'var(--primary)'
-    }}>
-      加载中...
-    </div>
-  )
+
+// 解析 URL 参数（静态版本）
+function getTripIdFromUrl(): string | null {
+  if (typeof window === 'undefined') return null
+  const params = new URLSearchParams(window.location.search)
+  return params.get('trip')
 }
 
 // 主页面组件
-function HomeContent() {
-  const searchParams = useSearchParams()
+export default function Home() {
   const router = useRouter()
-  const tripId = searchParams.get('trip')
+  const [selectedTripId, setSelectedTripId] = useState<string | null>(null)
   
-  const [selectedTripId, setSelectedTripId] = useState<string | null>(tripId)
-  
-  // 同步 URL 变化到 state
+  // 从 URL 初始化
   useEffect(() => {
-    setSelectedTripId(tripId)
-  }, [tripId])
+    const tripId = getTripIdFromUrl()
+    if (tripId) setSelectedTripId(tripId)
+  }, [])
   
   const selectedTrip = allTrips.find(t => t.id === selectedTripId) || null
 
@@ -511,14 +503,6 @@ function HomeContent() {
         </div>
       )}
     </main>
-  )
-}
-
-export default function Home() {
-  return (
-    <Suspense fallback={<Loading />}>
-      <HomeContent />
-    </Suspense>
   )
 }
 
