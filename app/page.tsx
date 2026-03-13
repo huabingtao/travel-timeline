@@ -2,98 +2,108 @@
 
 import { useState } from 'react'
 
-// 旅行数据
-const travelData = {
-  title: '漫步古都·寻味东瀛',
-  subtitle: '7天6夜 · 大阪 · 京都 · 奈良 · 神户',
-  badge: '🇯🇵 日本关西深度游',
-  stats: [
-    { value: '7', label: '天行程' },
-    { value: '4', label: '座城市' },
-    { value: '15+', label: '个景点' },
-  ],
-  days: [
-    {
-      day: 'DAY 1',
-      title: '抵达大阪',
-      weather: '☀️ 22°C',
-      activities: [
-        { time: '14:00', title: '✈️ 抵达关西国际机场', desc: '乘坐南海电铁前往难波站，车程约45分钟' },
-        { time: '16:00', title: '🏨 入住酒店', desc: '难波站附近酒店，办理入住并稍作休息' },
-        { time: '18:30', title: '🍜 道顿堀夜游', desc: '漫步美食街，品尝章鱼烧大阪烧', images: ['https://images.unsplash.com/photo-1576489922094-2cfe89fb173c?w=400&h=300&fit=crop', 'https://images.unsplash.com/photo-1555992336-fb0d29498b13?w=400&h=300&fit=crop'] },
-      ]
-    },
-    {
-      day: 'DAY 2',
-      title: '大阪城探索',
-      weather: '🌤️ 24°C',
-      activities: [
-        { time: '09:00', title: '🏯 大阪城公园', desc: '参观丰臣秀吉建造的天守阁', images: ['https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400&h=300&fit=crop'] },
-        { time: '12:00', title: '🍛 午餐：炸串串', desc: '尝遍各种油炸美食' },
-        { time: '14:30', title: '🗼 通天阁', desc: '登上展望台俯瞰大阪市区' },
-      ]
-    },
-    {
-      day: 'DAY 3',
-      title: '京都初见',
-      weather: '🌸 21°C',
-      activities: [
-        { time: '08:00', title: '🚃 前往京都', desc: '乘坐JR新快速前往京都，约15分钟' },
-        { time: '10:00', title: '⛩️ 清水寺', desc: '世界文化遗产，漫步音羽瀑布', images: ['https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=400&h=300&fit=crop'] },
-        { time: '15:00', title: '⛩️ 伏见稻荷大社', desc: '千本鸟居的隧道' },
-      ]
-    },
-    {
-      day: 'DAY 4',
-      title: '岚山竹林',
-      weather: '☁️ 20°C',
-      activities: [
-        { time: '09:00', title: '🎋 岚山竹林', desc: '漫步竹林小径', images: ['https://images.unsplash.com/photo-1570222094114-d054a817e56b?w=400&h=300&fit=crop'] },
-        { time: '13:00', title: '🚲 岚山骑行', desc: '租借自行车环游岚山地区' },
-      ]
-    },
-    {
-      day: 'DAY 5',
-      title: '奈良小鹿',
-      weather: '🌤️ 23°C',
-      activities: [
-        { time: '10:00', title: '🦌 奈良公园', desc: '与上千只小鹿亲密接触', images: ['https://images.unsplash.com/photo-1583553752222-8d496a2a2d08?w=400&h=300&fit=crop'] },
-        { time: '13:00', title: '⛩️ 东大寺', desc: '参观世界最大木质建筑' },
-      ]
-    },
-    {
-      day: 'DAY 6',
-      title: '神户漫游',
-      weather: '🌊 22°C',
-      activities: [
-        { time: '10:30', title: '🗿 北野异人馆', desc: '漫步欧式建筑街区', images: ['https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400&h=300&fit=crop'] },
-        { time: '13:00', title: '🥩 神户牛午餐', desc: '品尝世界闻名的神户和牛' },
-      ]
-    },
-    {
-      day: 'DAY 7',
-      title: '返程日',
-      weather: '☀️ 21°C',
-      activities: [
-        { time: '10:00', title: '🛍️ 最后购物', desc: '在难波商圈购买伴手礼' },
-        { time: '14:00', title: '✈️ 返程', desc: '前往关西国际机场，结束美好旅程' },
-      ]
-    },
-  ],
-  packing: [
-    { category: '👕 衣物', items: ['换洗衣物', '舒适运动鞋', '外套/轻薄羽绒服', '睡衣'] },
-    { category: '📱 电子设备', items: ['手机 + 充电器', '充电宝', '相机', '日本上网卡/流量包'] },
-    { category: '📄 证件', items: ['护照', '签证', '身份证', '机票行程单'] },
-    { category: '💊 其他', items: ['常用药品', '雨伞', '背包', '少量现金/信用卡'] },
-  ],
-  route: [
-    { icon: '🛫', name: '大阪', days: 'Day 1-2' },
-    { icon: '🏯', name: '京都', days: 'Day 3-4' },
-    { icon: '🦌', name: '奈良', days: 'Day 5' },
-    { icon: '🥩', name: '神户', days: 'Day 6' },
-    { icon: '🛬', name: '返程', days: 'Day 7' },
-  ],
+// 旅行数据 - 支持多条攻略
+type TripData = {
+  id: string
+  title: string
+  subtitle: string
+  badge: string
+  stats: { value: string; label: string }[]
+  heroCard: {
+    title: string
+    subtitle: string
+    date: string
+    route: string
+    distance: string
+    charging?: string
+  }
+  days: {
+    day: string
+    title: string
+    weather: string
+    activities: { time: string; title: string; desc: string; images?: string[] }[]
+  }[]
+  maps?: { 去的路线?: string; 服务区?: string }
+  packing: { category: string; items: string[] }[]
+  route: { icon: string; name: string; days: string }[]
 }
+
+const allTrips: TripData[] = [
+  {
+    id: 'ningbo',
+    title: '上海→宁波东西岙徒步',
+    subtitle: '2天1夜 · 特斯拉Model Y 2022后轮驱动版 · 4人',
+    badge: '🏔️ 宁波奉化溪口',
+    stats: [
+      { value: '2', label: '天行程' },
+      { value: '10km', label: '徒步里程' },
+      { value: '500m', label: '累计爬升' },
+      { value: '4', label: '人同行' },
+    ],
+    heroCard: {
+      title: '🚗 特斯拉Model Y 2022后轮驱动版 · 4人',
+      subtitle: '2天1夜 · 4人 · 3月14日-15日',
+      date: '2026年3月14日-15日',
+      route: '罗阳三村 → 宁波 → 罗阳三村',
+      distance: '约560km（往返）',
+      charging: '服务区超充站',
+    },
+    days: [
+      {
+        day: 'DAY 1',
+        title: '3月14日 周六：上海→宁波',
+        weather: '🌤️ 18°C',
+        activities: [
+          { time: '08:00', title: '🚗 罗阳三村出发', desc: '自驾特斯拉Model Y 2022后轮驱动版，4人出发' },
+          { time: '10:00', title: '🔋 充电休息', desc: '嘉兴服务区超充站充电+休息' },
+          { time: '12:30', title: '🚗 前往徒步起点', desc: '自驾前往奉化溪口镇东岙村停车场' },
+          { time: '13:00', title: '🥾 开始徒步', desc: '东西岙徒步路线：东岙村 → 三十六湾村 → 徐凫岩瀑布 → 西岙村（全程约10公里，4-5小时）' },
+          { time: '17:30', title: '🏠 下山返回', desc: '徒步结束，自驾前往酒店' },
+          { time: '18:00', title: '🛏️ 入住酒店', desc: '全季宁波诺丁汉大学寒松路地铁站酒店，办理入住' },
+          { time: '19:30', title: '🍺 晚餐&休息', desc: '酒店附近晚餐，品尝宁波海鲜，4人好好休息' },
+        ]
+      },
+      {
+        day: 'DAY 2',
+        title: '3月15日 周日：宁波→上海',
+        weather: '☀️ 20°C',
+        activities: [
+          { time: '08:00', title: '🌅 起床早餐', desc: '酒店享用早餐' },
+          { time: '09:00', title: '🛍️ 自由活动', desc: '可逛天一广场、老外滩，购买宁波特产' },
+          { time: '11:30', title: '🍜 午餐', desc: '品尝宁波汤圆、缸鸭狗等特色美食' },
+          { time: '12:30', title: '🚗 退房返程', desc: '自驾返回上海' },
+          { time: '15:00', title: '🔋 充电休息', desc: '嘉兴服务区超充' },
+          { time: '16:30', title: '🏠 抵达罗阳三村', desc: '结束愉快周末，4人平安回家' },
+        ]
+      },
+    ],
+    maps: {
+      去的路线: 'https://uri.amap.com/marker?markers=121.369,31.106;121.550,29.883&callnative=1',
+      服务区: 'https://www.amap.com/search?query=高速服务区充电站&city=330000',
+    },
+    packing: [
+      { category: '👕 衣物', items: ['舒适运动鞋', '登山鞋（防滑）', '速干衣', '外套/冲锋衣', '换洗衣物'] },
+      { category: '🎒 徒步装备', items: ['登山杖（保护膝盖）', '双肩包', '帽子/防晒', '墨镜', '充电宝'] },
+      { category: '📄 证件', items: ['身份证×4', '手机×4', '酒店订单', '驾照'] },
+      { category: '🚗 车用装备', items: ['充电器', '手机支架×2', '行车记录仪', '车内零食'] },
+      { category: '💊 其他', items: ['防晒霜', '少量现金', '零食/能量棒', '垃圾袋（环保）', '纸巾/湿巾'] },
+    ],
+    route: [
+      { icon: '🚗', name: '罗阳三村', days: 'Day 1 早' },
+      { icon: '🔋', name: '嘉兴服务区', days: 'Day 1 上午' },
+      { icon: '🏨', name: '全季酒店', days: 'Day 1 中午' },
+      { icon: '⛰️', name: '东岙村', days: 'Day 1 下午' },
+      { icon: '🏠', name: '酒店', days: 'Day 1 晚' },
+      { icon: '🛍️', name: '天一广场', days: 'Day 2 上午' },
+      { icon: '🔋', name: '服务区×2', days: 'Day 2 下午' },
+      { icon: '🚗', name: '罗阳三村', days: 'Day 2 傍晚' },
+    ],
+  },
+  // 可以继续添加更多攻略...
+]
+
+// 当前的旅行数据（根据选择的攻略）
+const travelData = allTrips[0]
 
 // Header 组件
 function Header() {
@@ -102,13 +112,10 @@ function Header() {
       <div style={styles.headerInner}>
         <a href="#" style={styles.logo}>
           <span style={styles.logoIcon}>✈️</span>
-          <span>旅行时光机</span>
+          <span>时光机</span>
         </a>
         <nav style={styles.nav}>
-          <a href="#timeline">行程</a>
-          <a href="#packing">物品清单</a>
-          <a href="#route">路线</a>
-        </nav>
+          </nav>
       </div>
     </header>
   )
@@ -120,7 +127,7 @@ function Hero() {
     <section style={styles.hero}>
       <div style={styles.heroContent}>
         <div style={styles.heroBadge}>{travelData.badge}</div>
-        <h1 style={styles.heroTitle}>漫步古都<br />寻味东瀛</h1>
+        <h1 style={styles.heroTitle}>上海→宁波<br />东西岙徒步</h1>
         <p style={styles.heroSubtitle}>{travelData.subtitle}</p>
         <div style={styles.heroStats}>
           {travelData.stats.map((stat, i) => (
@@ -135,9 +142,51 @@ function Hero() {
   )
 }
 
-// DayCard 组件
+// 首页卡片组件
+function HeroCard({ trip }: { trip: TripData }) {
+  return (
+    <section style={styles.heroCardSection}>
+      <div style={styles.heroCard}>
+        <div style={styles.heroCardHeader}>
+          <h2 style={styles.heroCardTitle}>{trip.heroCard.title}</h2>
+          <span style={styles.heroCardDate}>{trip.heroCard.date}</span>
+        </div>
+        <div style={styles.heroCardContent}>
+          <div style={styles.heroCardRow}>
+            <span style={styles.heroCardLabel}>📍 路线</span>
+            <span>{trip.heroCard.route}</span>
+          </div>
+          <div style={styles.heroCardRow}>
+            <span style={styles.heroCardLabel}>📏 距离</span>
+            <span>{trip.heroCard.distance}</span>
+          </div>
+          {trip.heroCard.charging && (
+            <div style={styles.heroCardRow}>
+              <span style={styles.heroCardLabel}>🔋 充电</span>
+              <span>{trip.heroCard.charging}</span>
+            </div>
+          )}
+          {trip.maps?.去的路线 && (
+            <div style={styles.heroCardRow}>
+              <span style={styles.heroCardLabel}>🗺️ 高德地图</span>
+              <a 
+                href={trip.maps.去的路线} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={styles.heroCardLink}
+              >
+                查看路线 →
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 function DayCard({ day, index }: { day: typeof travelData.days[0], index: number }) {
-  const [expanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(true)
 
   return (
     <div style={{ ...styles.timelineItem, animationDelay: `${(index + 1) * 0.1}s` } as React.CSSProperties}>
@@ -186,16 +235,14 @@ function DayCard({ day, index }: { day: typeof travelData.days[0], index: number
 }
 
 // Timeline 组件
-function Timeline() {
+function Timeline({ trip }: { trip: TripData }) {
   return (
-    <section id="timeline" style={styles.section}>
-      <h2 style={styles.sectionTitle}>每日行程</h2>
-      <div style={styles.timeline}>
-        {travelData.days.map((day, i) => (
-          <DayCard key={i} day={day} index={i} />
-        ))}
-      </div>
-    </section>
+    <div style={styles.timeline}>
+      <div style={styles.timelineLine}></div>
+      {trip.days.map((day, i) => (
+        <DayCard key={i} day={day} index={i} />
+      ))}
+    </div>
   )
 }
 
@@ -247,13 +294,13 @@ function PackingCategory({ category: cat, index }: { category: { category: strin
 }
 
 // Packing 组件
-function Packing() {
+function Packing({ trip }: { trip: TripData }) {
   return (
     <section id="packing" style={styles.section}>
       <h2 style={styles.sectionTitle}>物品清单</h2>
       <div style={styles.packingSection}>
         <div style={styles.packingGrid}>
-          {travelData.packing.map((cat, i) => (
+          {trip.packing.map((cat, i) => (
             <PackingCategory key={i} category={cat} index={i} />
           ))}
         </div>
@@ -263,19 +310,19 @@ function Packing() {
 }
 
 // Route 组件
-function Route() {
+function Route({ trip }: { trip: TripData }) {
   return (
     <section id="route" style={styles.section}>
       <h2 style={styles.sectionTitle}>路线规划</h2>
       <div style={styles.routeSection}>
         <div style={styles.routeMap}>
           <div style={{ textAlign: 'center', color: 'var(--primary)' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '8px' }}>🗾</div>
-            <div style={{ fontWeight: 600 }}>关西地区路线图</div>
+            <div style={{ fontSize: '3rem', marginBottom: '8px' }}>🗺️</div>
+            <div style={{ fontWeight: 600 }}>{trip.title} 路线图</div>
           </div>
         </div>
         <div style={styles.routeNodes}>
-          {travelData.route.map((node, i) => (
+          {trip.route.map((node, i) => (
             <div key={i} style={styles.routeNode}>
               <div style={styles.routeNodeIcon}>{node.icon}</div>
               <div style={styles.routeNodeName}>{node.name}</div>
@@ -285,16 +332,16 @@ function Route() {
         </div>
         <div style={styles.routeStats}>
           <div style={styles.routeStat}>
-            <div style={styles.routeStatValue}>~350km</div>
+            <div style={styles.routeStatValue}>{trip.heroCard.distance}</div>
             <div style={styles.routeStatLabel}>总行程</div>
           </div>
           <div style={styles.routeStat}>
-            <div style={styles.routeStatValue}>7天</div>
-            <div style={styles.routeStatLabel}>旅行时间</div>
+            <div style={styles.routeStatValue}>{trip.stats[0].value}</div>
+            <div style={styles.routeStatLabel}>旅行天数</div>
           </div>
           <div style={styles.routeStat}>
-            <div style={styles.routeStatValue}>4城</div>
-            <div style={styles.routeStatLabel}>目的地</div>
+            <div style={styles.routeStatValue}>{trip.route.length}</div>
+            <div style={styles.routeStatLabel}>途经点</div>
           </div>
         </div>
       </div>
@@ -334,16 +381,99 @@ function Footer() {
 
 // 主页面组件
 export default function Home() {
+  const [selectedTripId, setSelectedTripId] = useState<string | null>(null)
+  const selectedTrip = allTrips.find(t => t.id === selectedTripId) || null
+
   return (
     <main>
       <Header />
-      <Hero />
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
-        <Timeline />
-        <Packing />
-        <Route />
-      </div>
-      <Footer />
+      {selectedTrip ? (
+        // 详情页面
+        <div style={{ maxWidth: '800px', margin: '0 auto', padding: '100px 24px 40px' }}>
+          <button 
+            onClick={() => setSelectedTripId(null)}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: 'var(--primary)', 
+              cursor: 'pointer',
+              fontSize: '1rem',
+              marginBottom: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            ← 返回列表
+          </button>
+          <div style={{ marginBottom: '24px' }}>
+            <span style={{ fontSize: '2rem', marginRight: '8px' }}>{selectedTrip.badge}</span>
+            <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.8rem', color: 'var(--primary)', fontWeight: 600 }}>
+              {selectedTrip.title}
+            </span>
+          </div>
+          <Timeline trip={selectedTrip} />
+        </div>
+      ) : (
+        // 首页卡片列表
+        <div style={{ maxWidth: '800px', margin: '0 auto', padding: '100px 24px 40px' }}>
+          <h2 style={{ 
+            fontFamily: "'Playfair Display', serif", 
+            fontSize: '2rem', 
+            color: 'var(--primary)', 
+            marginBottom: '32px',
+            textAlign: 'center' 
+          }}>
+            我的旅行时光机
+          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {allTrips.map(trip => (
+              <div 
+                key={trip.id}
+                onClick={() => setSelectedTripId(trip.id)}
+                style={{
+                  background: 'white',
+                  borderRadius: '20px',
+                  padding: '24px',
+                  boxShadow: 'var(--shadow)',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)'
+                  e.currentTarget.style.boxShadow = 'var(--shadow-hover)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow = 'var(--shadow)'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                  <div>
+                    <span style={{ fontSize: '1.5rem', marginRight: '8px' }}>{trip.badge}</span>
+                    <h3 style={{ fontSize: '1.3rem', color: 'var(--primary)', display: 'inline' }}>{trip.title}</h3>
+                  </div>
+                  <span style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>{trip.heroCard.date}</span>
+                </div>
+                <p style={{ color: 'var(--text-light)', marginBottom: '16px' }}>{trip.subtitle}</p>
+                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                  {trip.stats.map((stat, i) => (
+                    <span key={i} style={{ 
+                      background: 'var(--secondary)', 
+                      padding: '4px 12px', 
+                      borderRadius: '20px',
+                      fontSize: '0.85rem',
+                      color: 'var(--primary)'
+                    }}>
+                      {stat.value} {stat.label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </main>
   )
 }
@@ -385,6 +515,84 @@ const styles: { [key: string]: React.CSSProperties } = {
   nav: {
     display: 'flex',
     gap: '32px',
+  },
+  heroCardSection: {
+    padding: '100px 24px 40px',
+    background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%)',
+  },
+  heroCard: {
+    maxWidth: '800px',
+    margin: '0 auto',
+    background: 'white',
+    borderRadius: '20px',
+    boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+    overflow: 'hidden',
+  },
+  heroCardHeader: {
+    background: 'linear-gradient(135deg, var(--primary) 0%, #3d7a64 100%)',
+    color: 'white',
+    padding: '24px 32px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap' as const,
+    gap: '12px',
+  },
+  heroCardTitle: {
+    fontSize: '1.5rem',
+    fontWeight: 600,
+    margin: 0,
+  },
+  heroCardDate: {
+    opacity: 0.9,
+    fontSize: '0.95rem',
+  },
+  heroCardContent: {
+    padding: '24px 32px',
+  },
+  heroCardRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '12px 0',
+    borderBottom: '1px solid #eee',
+  },
+  heroCardLabel: {
+    fontWeight: 600,
+    color: 'var(--primary)',
+  },
+  heroCardLink: {
+    color: 'var(--accent)',
+    textDecoration: 'none',
+    fontWeight: 500,
+  },
+  tripSelector: {
+    padding: '80px 24px 20px',
+    background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%)',
+  },
+  tripSelectorInner: {
+    maxWidth: '1200px',
+    margin: '0 auto',
+    display: 'flex',
+    gap: '12px',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  },
+  tripSelectorBtn: {
+    padding: '12px 24px',
+    border: '2px solid var(--primary)',
+    borderRadius: '30px',
+    background: 'white',
+    color: 'var(--primary)',
+    fontSize: '0.95rem',
+    fontWeight: 500,
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    fontFamily: 'inherit',
+  },
+  tripSelectorBtnActive: {
+    background: 'var(--primary)',
+    color: 'white',
   },
   hero: {
     height: '70vh',
@@ -457,31 +665,46 @@ const styles: { [key: string]: React.CSSProperties } = {
   timeline: {
     position: 'relative' as const,
     padding: '20px 0',
+    maxWidth: '800px',
+    margin: '0 auto',
   },
   timelineItem: {
     position: 'relative' as const,
-    width: '50%',
-    padding: '0 40px 60px',
+    width: '100%',
+    padding: '0 0 40px 50px',
     opacity: 0,
     animation: 'fadeInUp 0.6s forwards',
   },
+  timelineLine: {
+    position: 'absolute' as const,
+    left: '12px',
+    top: '0',
+    bottom: '0',
+    width: '4px',
+    background: 'linear-gradient(to bottom, var(--primary), var(--accent))',
+    borderRadius: '2px',
+    zIndex: 0,
+  },
   timelineDot: {
     position: 'absolute' as const,
-    width: '20px',
-    height: '20px',
+    left: '0',
+    top: '20px',
+    width: '24px',
+    height: '24px',
     background: 'var(--accent)',
-    border: '4px solid var(--bg)',
+    border: '4px solid white',
     borderRadius: '50%',
-    top: 0,
     boxShadow: '0 0 0 4px rgba(232, 115, 74, 0.3)',
+    zIndex: 1,
   },
   dayCard: {
     background: 'var(--card-bg)',
-    borderRadius: '16px',
+    borderRadius: '20px',
     overflow: 'hidden',
     boxShadow: 'var(--shadow)',
     transition: 'all 0.3s ease',
     cursor: 'pointer',
+    marginLeft: '20px',
   },
   dayHeader: {
     background: 'linear-gradient(135deg, var(--primary), #3d7a64)',
@@ -517,20 +740,24 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: '20px',
   },
   activity: {
-    display: 'grid',
-    gridTemplateColumns: 'auto 1fr',
+    display: 'flex',
     gap: '16px',
-    alignItems: 'start',
-    padding: '16px',
+    alignItems: 'flex-start',
+    padding: '20px',
     background: 'var(--secondary)',
     borderRadius: '12px',
+    marginBottom: '12px',
   },
   activityTime: {
     fontFamily: "'DM Sans', sans-serif",
     fontWeight: 700,
     color: 'var(--accent)',
-    fontSize: '0.875rem',
+    fontSize: '0.9rem',
     whiteSpace: 'nowrap' as const,
+    minWidth: '70px',
+    background: 'white',
+    padding: '4px 8px',
+    borderRadius: '6px',
   },
   activityInfo: {
     flex: 1,
