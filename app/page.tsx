@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 
 // 旅行数据 - 支持多条攻略
@@ -380,8 +380,23 @@ function Footer() {
   )
 }
 
+// 加载组件
+function Loading() {
+  return (
+    <div style={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      minHeight: '50vh',
+      color: 'var(--primary)'
+    }}>
+      加载中...
+    </div>
+  )
+}
+
 // 主页面组件
-export default function Home() {
+function HomeContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const tripId = searchParams.get('trip')
@@ -496,6 +511,14 @@ export default function Home() {
         </div>
       )}
     </main>
+  )
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <HomeContent />
+    </Suspense>
   )
 }
 
