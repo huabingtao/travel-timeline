@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 
 // 旅行数据 - 支持多条攻略
 type TripData = {
@@ -28,7 +29,7 @@ type TripData = {
   route: { icon: string; name: string; days: string }[]
 }
 
-const allTrips: TripData[] = [
+export const allTrips: TripData[] = [
   {
     id: 'ningbo',
     title: '上海→宁波东西岙徒步',
@@ -381,8 +382,28 @@ function Footer() {
 
 // 主页面组件
 export default function Home() {
-  const [selectedTripId, setSelectedTripId] = useState<string | null>(null)
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const tripId = searchParams.get('trip')
+  
+  const [selectedTripId, setSelectedTripId] = useState<string | null>(tripId)
+  
+  // 同步 URL 变化到 state
+  useEffect(() => {
+    setSelectedTripId(tripId)
+  }, [tripId])
+  
   const selectedTrip = allTrips.find(t => t.id === selectedTripId) || null
+
+  const handleBack = () => {
+    setSelectedTripId(null)
+    router.push('/')
+  }
+
+  const handleCardClick = (id: string) => {
+    setSelectedTripId(id)
+    router.push(`/?trip=${id}`)
+  }
 
   return (
     <main>
@@ -391,7 +412,7 @@ export default function Home() {
         // 详情页面
         <div style={{ maxWidth: '800px', margin: '0 auto', padding: '100px 24px 40px' }}>
           <button 
-            onClick={() => setSelectedTripId(null)}
+            onClick={handleBack}
             style={{ 
               background: 'none', 
               border: 'none', 
@@ -430,7 +451,7 @@ export default function Home() {
             {allTrips.map(trip => (
               <div 
                 key={trip.id}
-                onClick={() => setSelectedTripId(trip.id)}
+                onClick={() => handleCardClick(trip.id)}
                 style={{
                   background: 'white',
                   borderRadius: '20px',
